@@ -97,7 +97,7 @@ async def auth(request: Request):
 
 ``` shell
 # the audio contents two sentences ["Nice to meet you.", "Welcome to China."]
-# use python sphinx/utils to generate an audio by Chat-TTS
+# use python sphinx/utils.py to generate an audio by Chat-TTS
 # texts = ["Nice to meet you.", "Welcome to China."]
 # chat, params_infer_code, params_refine_text = load_tts_model()
 # wave = texttoaudio(texts, chat, params_infer_code, params_refine_text)
