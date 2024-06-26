@@ -93,17 +93,22 @@ async def auth(request: Request):
 
 * call service /hi_sphinx/text `curl -X GET -H "Authorization: Bearer [replace with a valid token]" -H "Content-Type: application/json" http://localhost:8888/hi_sphinx/text  -F "file=@temp.wav"      -F "metadata={\"filename\": \"temp.wav\", \"description\": \"Sample audio file\"};type=application/json"` get the replay audio.
 
-## Demo
+## 4. Demo
 
 [To Be Done]
 
+## 5. Test
 
-## To Do List
+* use `pytest` to run the unit test
 
-[x] create the audio to text service
-[x] create the audio to audio service
-[] create image, audio to audio service
-[] use XIAO ESP32 sence to get the audio
-[] use XIAO ESP32 sense to connect a headphone to play the voice
-[] use 3D printer to create a cover
-[] create an IOS app to display the result 
+
+## 6. To Do List
+
+* [x] create the audio to text service
+* [x] create the audio to audio service
+* [] create image, audio to audio service
+* [] use XIAO ESP32 sence to get the audio
+* [] use XIAO ESP32 sense to connect a headphone to play the voice
+* [] use 3D printer to create a cover
+* [] create an IOS app to display the result
+* [] control some IoT device
