@@ -6,19 +6,39 @@ torch._dynamo.config.suppress_errors = True
 torch.set_float32_matmul_precision('high')
 torch.backends.cudnn.enabled = False
 import ChatTTS
-from IPython.display import Audio
 import torchaudio
+import requests
+import json
 
+def load_stt_model(
+    model_name: str
+    ):
+    """
+    Load the stt models whisper is used now
+    Args:
+        model_name(str): The name of the model
 
-def load_stt_model(model_name: str):
+    Returns:
+        Whisper: The whisper model
+
+    """
     return whisper.load_model(model_name)
 
-def audiototext(model, filename: str):
+def audiototext(
+    model,
+    filename: str
+    ) -> str:
     result = model.transcribe(filename)
     return result["text"]
 
 
 def load_tts_model():
+    """
+    Load the tts models ChatTTS is now used
+
+    Returns:
+        model
+    """
     chat = ChatTTS.Chat()
     chat.load_models()
     spk = torch.load("source/seed_2155_restored_emb.pt")
@@ -35,28 +55,53 @@ def load_tts_model():
     return chat, params_infer_code, params_refine_text
     
 
-    
-
-def texttoautio(chat, params_infer_code, params_refine_text, texts : list):
+def texttoaudio(
+        texts : list,
+        chat,
+        params_infer_code,
+        params_refine_text
+    ):
     if len(texts) > 0:
-        # wavs = chat.infer(texts)
+        # wavs = chat.infer(texts) # default parameters
         wavs = chat.infer(texts, skip_refine_text=True, params_refine_text=params_refine_text, params_infer_code=params_infer_code)
         waveforms = []
         for wav in wavs:
             waveforms.append(torch.from_numpy(wav))
         merged_waveform = torch.cat(waveforms, dim=1)
         return merged_waveform
-        # torchaudio.save("output.wav", merged_waveform, 24000, format="wav")
+        # torchaudio.save("output.wav", merged_waveform, 24000, format="wav") # save the wave to local
     else:
         print(f"No response")
 
+def call_ollama_text(
+        prompt: str,
+        images: list = None,
+        model: str = 'llama3',
+        is_stream=False,
+        url='http://localhost:11434/api/generate'
+    ) -> str:
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": is_stream
+    }
+
+    if images:
+        payload['images'] = images
+
+    response = requests.post(url, data=json.dumps(payload), headers={"Content-Type": "application/json"})
+    if response.status_code == 200:
+        texts = [response.json()['response']][0]
+        return texts
+    else:
+        print(f"Request failed with status code: {response.status_code}, Response text: {response.text}")
+    return None
 
 if __name__ == '__main__':
-    # model = load_stt_model('large')
-    # result = audiototext(model, 'source/test.wav')
-    # print(result)
+    model = load_stt_model('large')
+    result = audiototext(model, 'source/test.wav')
+    print(result)
     texts = ["Nice to meet you.", "Welcome to China."]
     chat, params_infer_code, params_refine_text = load_tts_model()
-    print(chat)
     wave = texttoautio(chat, params_infer_code, params_refine_text, texts)
     torchaudio.save("temp.wav", wave, 24000, format="wav")

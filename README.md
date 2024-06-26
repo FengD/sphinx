@@ -21,3 +21,10 @@ C -- text response --> D[Chat-TTS]
 C -- actionbyHomeAssisstant --> G[hardware]
 D -- voice --> E[Earphone or Audio]
 ```
+
+## How to Use
+
+
+## Demo
+
+## To Do List
