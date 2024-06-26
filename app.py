@@ -119,9 +119,9 @@ def main():
     # warm up
     texttoaudio(texts, chat, params_infer_code, params_refine_text)
     
+    print("Sphinx is ready!")
     app.configure_authentication(BasicAuthHandler(token_getter=BearerGetter()))
     app.start(host=args.host, port=args.port)
-    print("Sphinx is ready!")
 
 if __name__ == "__main__":
     main()
