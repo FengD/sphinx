@@ -103,5 +103,5 @@ if __name__ == '__main__':
     print(result)
     texts = ["Nice to meet you.", "Welcome to China."]
     chat, params_infer_code, params_refine_text = load_tts_model()
-    wave = texttoautio(chat, params_infer_code, params_refine_text, texts)
+    wave = texttoaudio(texts, chat, params_infer_code, params_refine_text)
     torchaudio.save("temp.wav", wave, 24000, format="wav")

@@ -99,7 +99,7 @@ def main():
     parser.add_argument('--host', type=str, help='The IP address of the application', default='0.0.0.0')
     parser.add_argument('--port', type=int, help='The port of the application', default=8888)
     parser.add_argument('--database_url', type=str, help='The url of the database', default='sqlite:///./database/sphinx.db')
-    parser.add_argument('--stt_model_type', type=str, help='The type of the stt model, could be tiny, base, large', default='tiny')
+    parser.add_argument('--stt_model_type', type=str, help='The type of the stt model, could be tiny, base, large', default='large')
     parser.add_argument('--verbose', action='store_true', help='Enable verbose mode')
     
     args = parser.parse_args()
@@ -115,9 +115,13 @@ def main():
     model = load_stt_model(args.stt_model_type)
 
     chat, params_infer_code, params_refine_text = load_tts_model()
-
+    texts = ["Nice to meet you.", "Welcome to China."]
+    # warm up
+    texttoaudio(texts, chat, params_infer_code, params_refine_text)
+    
     app.configure_authentication(BasicAuthHandler(token_getter=BearerGetter()))
     app.start(host=args.host, port=args.port)
+    print("Sphinx is ready!")
 
 if __name__ == "__main__":
     main()
