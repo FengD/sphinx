@@ -11,12 +11,11 @@ def split_long_text(text, max_length=100):
         else:
             if current_segment:
                 result.append(current_segment)
-            current_segment = segments
+            current_segment = segment
     if current_segment:
         result.append(current_segment)
 
     return result
-
 
 def clean_no_need_text(text):
     text = text.replace('\n', ' ').strip()
