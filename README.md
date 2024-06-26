@@ -72,12 +72,14 @@ INFO:actix_server.server:Actix runtime found; starting in Actix runtime
 
 * register a user `curl -X POST -H "Content-Type: application/json" -d '{"username": "Bob", "password": "123456"}' http://localhost:8888/users/register`.
 ``` shell
+# output:
 <User(uuid=39b043b9-304d-4679-9fc7-df1d5b9b5f85, username=Bob, hashed_password=$2b$12$3XrBRJ.eLO/KaYlaridpHevwtz3fkghgfgmPotFbFAV5dzXZH7xP.)>
 ```
 
 * login and get the token `curl -X POST -H "Content-Type: application/json" -d '{"username": "Noe", "password": "123456"}' http://localhost:8888/users/login`
 
 ``` shell
+# output: 
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6Ik5vZSIsImV4cCI6MTcxOTM5MTY0NX0.jBgg2GJKSeehd3BD4_wJr0eVgwf52uVKqaz2WfvePhs
 ```
 
@@ -92,6 +94,17 @@ async def auth(request: Request):
 
 
 * call service /hi_sphinx/text `curl -X GET -H "Authorization: Bearer [replace with a valid token]" -H "Content-Type: application/json" http://localhost:8888/hi_sphinx/text  -F "file=@temp.wav"      -F "metadata={\"filename\": \"temp.wav\", \"description\": \"Sample audio file\"};type=application/json"` get the replay audio.
+
+``` shell
+# the audio contents two sentences ["Nice to meet you.", "Welcome to China."]
+# use python sphinx/utils to generate an audio by Chat-TTS
+# texts = ["Nice to meet you.", "Welcome to China."]
+# chat, params_infer_code, params_refine_text = load_tts_model()
+# wave = texttoaudio(texts, chat, params_infer_code, params_refine_text)
+# torchaudio.save("temp.wav", wave, 24000, format="wav")
+# output: 
+Thank you. Its great to be here in China, and Im excited to learn more about this fascinating country and culture. Im looking forward to our conversation.
+```
 
 ## 4. Demo
 
