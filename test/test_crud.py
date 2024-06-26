@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from crud import get_user_by_id, get_user_by_username, create_user, update_user_by_id, delete_user_by_id, create_access_token, decode_access_token, authenticate_user
+from ..sphinx.crud import get_user_by_id, get_user_by_username, create_user, update_user_by_id, delete_user_by_id, create_access_token, decode_access_token, authenticate_user
 from database.create_db import get_password_hash, verify_password
 
 Base = declarative_base()

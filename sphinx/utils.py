@@ -52,10 +52,11 @@ def texttoautio(chat, params_infer_code, params_refine_text, texts : list):
 
 
 if __name__ == '__main__':
-    model = load_stt_model('large')
-    result = audiototext(model, 'source/test.wav')
-    print(result)
-    texts = ['如果你想了解投资理财，我强烈推薦一本经典著作A Random Walk Down Wall Street华尔街随机之旅。這本書是美國財經學家Burton G.', ' Malkiel所寫的，於1973年首次出版。它對投資理財的理解和策略進行了深入的分析和解釋。 這本書的優點在于， 1.', ' 系統性，Malkiel將投資理財的基本概念，市場定義和投资策略進行了一個系統的總結，幫助讀者對投資理財有了一個全面的理解。 2.', ' 實踐性，書中提出了多種實踐性的投资策略，例如平均投资，分散投资和價值投资等，並且對這些策略進行了詳細的分析和比較。 3.', ' 權威性，Malkiel是一位知名的財經學家，他的觀點和分析都是基於經驗和證據支持的，因此這本書的內容是可靠的和有用的。', ' 總之，A Random Walk Down Wall Street是一本經典的投資理財著作，對任何想了解投资理财的人来说都是非常重要和有用的讀物。']
+    # model = load_stt_model('large')
+    # result = audiototext(model, 'source/test.wav')
+    # print(result)
+    texts = ["Nice to meet you.", "Welcome to China."]
     chat, params_infer_code, params_refine_text = load_tts_model()
+    print(chat)
     wave = texttoautio(chat, params_infer_code, params_refine_text, texts)
     torchaudio.save("temp.wav", wave, 24000, format="wav")

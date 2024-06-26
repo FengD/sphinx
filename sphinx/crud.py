@@ -1,9 +1,8 @@
 from sqlalchemy.orm import Session
-from model import  User
+from .model import  User
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
-from database.create_db import get_password_hash, verify_password
-from database.create_db import generate_uuid
+from jose import jwt
+from database.create_db import get_password_hash, verify_password, generate_uuid
 
 def get_user_by_id(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
@@ -67,7 +66,7 @@ def authenticate_user(db: Session, username: str, password: str):
 if __name__ == '__main__':
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
-    DATABASE_URL = "sqlite:///./database/sphinx.db"
+    DATABASE_URL = "sqlite:///../database/sphinx.db"
     engine = create_engine(DATABASE_URL)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

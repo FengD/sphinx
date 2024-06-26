@@ -1,7 +1,6 @@
 import sqlite3
 import uuid
 from passlib.context import CryptContext
-from jose import JWTError, jwt
 
 def generate_uuid():
     return str(uuid.uuid4())
