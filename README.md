@@ -90,7 +90,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6Ik5vZSIsImV4cCI6MTcxOTM5MTY0NX0
 async def auth(request: Request):
 ```
 
-* call service /hi_sphinx/audio_input `curl -X GET -H "Authorization: Bearer [replace with a valid token]" -H "Content-Type: application/json" http://localhost:8888/hi_sphinx/audio_input?output_type=base64  -F "file=@temp.wav"      -F "metadata={\"filename\": \"temp.wav\", \"description\": \"Sample audio file\"};type=application/json"` get the repley audio in base64.
+* call service /hi_sphinx/audio_input `curl -X GET -H "Authorization: Bearer [replace with a valid token]" -H "Content-Type: application/json" http://localhost:8888/hi_sphinx/audio_file_input?output_type=base64  -F "file=@temp.wav"      -F "metadata={\"filename\": \"temp.wav\", \"description\": \"Sample audio file\"};type=application/json"` get the repley audio in base64.
 
 
 * call service /hi_sphinx/text_input `curl -X GET -H "Authorization: Bearer [replace with a valid token]" -H "Content-Type: application/json" -d '{"prompt": "what's your name?"}' http://localhost:8888/hi_sphinx/text_input?output_type=html ` get the replay audio in html.
@@ -107,8 +107,10 @@ Thank you. Its great to be here in China, and Im excited to learn more about thi
 ```
 
 ## 4. Demo
-* Try 3.
-[More To Be Done]
+
+![](demo/demo.png)
+
+* [More To Be Done]
 
 ## 5. Test
 
@@ -120,6 +122,7 @@ Thank you. Its great to be here in China, and Im excited to learn more about thi
 * [x] create the audio to text service
 * [x] create the audio to audio service
 * [x] create the text to audio service
+* [x] create a simple webui to test the service 
 * [ ] create image, audio to audio service
 * [ ] use XIAO ESP32 sence to get the audio
 * [ ] use XIAO ESP32 sense to connect a headphone to play the voice

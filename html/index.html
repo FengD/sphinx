@@ -17,7 +17,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .chat-box {
-            height: 300px;
+            height: 400px;
             overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -53,9 +53,6 @@
             display: flex;
             gap: 10px;
         }
-        #audio-record {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -69,8 +66,7 @@
             <option value="base64">Audio</option>
         </select>
         <button onclick="sendMessage()">Send</button>
-        <button onclick="startRecording()">🎤</button>
-        <button id="audio-record" onclick="stopRecording()">Stop</button>
+        <button id="audio-record-btn" onclick="toggleRecording()">🎤</button>
     </div>
 </div>
 
@@ -81,6 +77,7 @@
     const responseTypeSelect = document.getElementById('response-type');
     let mediaRecorder;
     let audioChunks = [];
+    let isRecording = false;
 
     function appendMessage(content, className, isAudio = false) {
         const messageElement = document.createElement('div');
@@ -121,27 +118,62 @@
 
     function sendMessage() {
         const text = textInput.value;
-        if (!text) return;
-
-        appendMessage(text, 'user-message');
+        if (!text && !audioChunks.length) return;
 
         const responseType = responseTypeSelect.value;
 
-        axios.post(`/hi_sphinx/text_input?output_type=${responseType}`, { prompt: text })
-            .then(response => {
-                if (response.data) {
-                    if (responseType === 'base64') {
-                        appendMessage(response.data, 'bot-message', true);
-                    } else {
-                        appendMessage(response.data, 'bot-message');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        if (audioChunks.length) {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64AudioMessage = reader.result.split(',')[1];
+                appendMessage(base64AudioMessage, 'user-message', true);
 
-        textInput.value = '';
+                axios.post(`/hi_sphinx/audio_stream_input?output_type=${responseType}`, base64AudioMessage, {
+                    headers: { 'Content-Type': 'application/octet-stream' }
+                })
+                    .then(response => {
+                        if (response.data) {
+                            if (responseType === 'base64') {
+                                appendMessage(response.data, 'bot-message', true);
+                            } else {
+                                appendMessage(response.data, 'bot-message');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            };
+            reader.readAsDataURL(audioBlob);
+            audioChunks = [];
+        } else {
+            appendMessage(text, 'user-message');
+
+            axios.post(`/hi_sphinx/text_input?output_type=${responseType}`, { prompt: text })
+                .then(response => {
+                    if (response.data) {
+                        if (responseType === 'base64') {
+                            appendMessage(response.data, 'bot-message', true);
+                        } else {
+                            appendMessage(response.data, 'bot-message');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            textInput.value = '';
+        }
+    }
+
+    function toggleRecording() {
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
     }
 
     function startRecording() {
@@ -157,29 +189,13 @@
                     const reader = new FileReader();
                     reader.onload = () => {
                         const base64AudioMessage = reader.result.split(',')[1];
-
-                        const responseType = responseTypeSelect.value;
-
-                        axios.post(`/hi_sphinx/audio_input?output_type=${responseType}`, base64AudioMessage, {
-                            headers: { 'Content-Type': 'application/octet-stream' }
-                        })
-                            .then(response => {
-                                if (response.data) {
-                                    if (responseType === 'base64') {
-                                        appendMessage(response.data, 'bot-message', true);
-                                    } else {
-                                        appendMessage(response.data, 'bot-message');
-                                    }
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
+                        // appendMessage(base64AudioMessage, 'user-message', true);
                     };
                     reader.readAsDataURL(audioBlob);
                 };
                 audioChunks = [];
-                document.getElementById('audio-record').style.display = 'inline';
+                isRecording = true;
+                document.getElementById('audio-record-btn').innerText = '⏹';
             })
             .catch(error => {
                 console.error('Error accessing microphone:', error);
@@ -189,8 +205,9 @@
     function stopRecording() {
         if (mediaRecorder) {
             mediaRecorder.stop();
+            isRecording = false;
+            document.getElementById('audio-record-btn').innerText = '🎤';
         }
-        document.getElementById('audio-record').style.display = 'none';
     }
 </script>
 </body>

@@ -41,6 +41,22 @@ class BasicAuthHandler(AuthenticationHandler):
 # @app.after_request()
 # async def log_response(response: Response):
 #     logger.info(f"Sending response: %s", response)
+    
+def sphinx(text, type):
+    texts = call_ollama_text(prompt=text)
+    if len(texts) > 0:
+        if type == 'text':
+            return texts
+        texts = clean_no_need_text(texts)
+        texts = normalize_text(texts)
+        texts = split_long_text(texts, 100)
+
+    merged_waveform = texttoaudio(texts, chat, params_infer_code, params_refine_text)
+    merged_waveformbase64 = wav_tensor_to_base64(merged_waveform)
+    if type == 'base64':
+        return merged_waveformbase64
+    else:
+        return html(wav_base64_to_html(merged_waveformbase64))
 
 @app.exception
 def handle_exception(error):
@@ -70,25 +86,26 @@ async def hi_sphinx_text(request):
     try:
         body = request.json()
         text = body['prompt']
-        texts = call_ollama_text(prompt=text)
-        if len(texts) > 0:
-            if type == 'text':
-                return texts
-            texts = clean_no_need_text(texts)
-            texts = normalize_text(texts)
-            texts = split_long_text(texts, 100)
-
-        merged_waveform = texttoaudio(texts, chat, params_infer_code, params_refine_text)
-        merged_waveformbase64 = wav_tensor_to_base64(merged_waveform)
-        if type == 'base64':
-            return merged_waveformbase64
-        else:
-            return html(wav_base64_to_html(merged_waveformbase64))
+        return sphinx(text, type)
     except Exception as e:
         error_message = ''.join(traceback.format_exception(None, e, e.__traceback__))
         print("Error:", error_message)
 
-@app.post("/hi_sphinx/audio_input")
+@app.post("/hi_sphinx/audio_stream_input")
+async def hi_sphinx_audio(request):
+    type = request.query_params.get("output_type", "html")
+    try:
+        audio_data = base64.b64decode(request.body)
+        filename = 'temp.wav'
+        with open(filename, 'wb') as f:
+            f.write(audio_data)
+        text = audiototext(model, filename)
+        return sphinx(text, type)
+    except Exception as e:
+        error_message = ''.join(traceback.format_exception(None, e, e.__traceback__))
+        print("Error:", error_message)
+
+@app.post("/hi_sphinx/audio_file_input")
 async def hi_sphinx_audio(request):
     type = request.query_params.get("output_type", "html")
     try:
@@ -98,20 +115,7 @@ async def hi_sphinx_audio(request):
         with open(filename, 'wb') as f:
             f.write(file)
         text = audiototext(model, filename)
-        texts = call_ollama_text(prompt=text)
-        if len(texts) > 0:
-            texts = clean_no_need_text(texts)
-            texts = normalize_text(texts)
-            if type == 'text':
-                return texts
-            texts = split_long_text(texts, 100)
-
-        merged_waveform = texttoaudio(texts, chat, params_infer_code, params_refine_text)
-        merged_waveformbase64 = wav_tensor_to_base64(merged_waveform)
-        if type == 'base64':
-            return merged_waveformbase64
-        else:
-            return html(wav_base64_to_html(merged_waveformbase64))
+        return sphinx(text, type)
     except Exception as e:
         error_message = ''.join(traceback.format_exception(None, e, e.__traceback__))
         print("Error:", error_message)
