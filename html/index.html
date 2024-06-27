@@ -86,9 +86,20 @@
         const messageElement = document.createElement('div');
         messageElement.className = `message ${className}`;
         
-        const img = document.createElement('img');
-        img.src = className === 'user-message' ? 'user-avatar.jpg' : 'bot-avatar.jpg';
-        
+        const img = document.createElement('div');
+        img.innerHTML = className === 'user-message' ? 
+            `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="black" stroke-width="2" fill="#FFCC00"/>
+                <circle cx="8" cy="10" r="2" fill="black"/>
+                <circle cx="16" cy="10" r="2" fill="black"/>
+                <path d="M12 16C14 16 15 18 15 18H9C9 18 10 16 12 16Z" fill="black"/>
+            </svg>` : 
+            `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="black" stroke-width="2" fill="#00CCFF"/>
+                <rect x="6" y="9" width="3" height="4" fill="black"/>
+                <rect x="15" y="9" width="3" height="4" fill="black"/>
+                <path d="M8 15C10 14 14 14 16 15" stroke="black" stroke-width="2"/>
+            </svg>`;
         messageElement.appendChild(img);
 
         const messageContent = document.createElement('div');

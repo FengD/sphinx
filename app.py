@@ -72,10 +72,10 @@ async def hi_sphinx_text(request):
         text = body['prompt']
         texts = call_ollama_text(prompt=text)
         if len(texts) > 0:
-            texts = clean_no_need_text(texts)
-            texts = normalize_text(texts)
             if type == 'text':
                 return texts
+            texts = clean_no_need_text(texts)
+            texts = normalize_text(texts)
             texts = split_long_text(texts, 100)
 
         merged_waveform = texttoaudio(texts, chat, params_infer_code, params_refine_text)
