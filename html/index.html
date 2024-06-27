@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .message {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .message img {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .message.user-message {
+            justify-content: flex-end;
+        }
+        .message.user-message img {
+            order: 1;
+            margin-right: 0;
+            margin-left: 10px;
+        }
+        .message.user-message .message-content {
+            text-align: right;
+        }
+        .message.bot-message {
+            justify-content: flex-start;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        #audio-record {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-box" id="chat-box"></div>
+    <div class="input-group">
+        <input type="text" id="text-input" placeholder="Type a message">
+        <select id="response-type">
+            <option value="text">Text</option>
+            <option value="base64">Audio</option>
+        </select>
+        <button onclick="sendMessage()">Send</button>
+        <button onclick="startRecording()">🎤</button>
+        <button id="audio-record" onclick="stopRecording()">Stop</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    const chatBox = document.getElementById('chat-box');
+    const textInput = document.getElementById('text-input');
+    const responseTypeSelect = document.getElementById('response-type');
+    let mediaRecorder;
+    let audioChunks = [];
+
+    function appendMessage(content, className, isAudio = false) {
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${className}`;
+        
+        const img = document.createElement('img');
+        img.src = className === 'user-message' ? 'user-avatar.jpg' : 'bot-avatar.jpg';
+        
+        messageElement.appendChild(img);
+
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+        
+        if (isAudio) {
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = `data:audio/wav;base64,${content}`;
+            messageContent.appendChild(audio);
+        } else {
+            messageContent.innerText = content;
+        }
+
+        messageElement.appendChild(messageContent);
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendMessage() {
+        const text = textInput.value;
+        if (!text) return;
+
+        appendMessage(text, 'user-message');
+
+        const responseType = responseTypeSelect.value;
+
+        axios.post(`/hi_sphinx/text_input?output_type=${responseType}`, { prompt: text })
+            .then(response => {
+                if (response.data) {
+                    if (responseType === 'base64') {
+                        appendMessage(response.data, 'bot-message', true);
+                    } else {
+                        appendMessage(response.data, 'bot-message');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        textInput.value = '';
+    }
+
+    function startRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64AudioMessage = reader.result.split(',')[1];
+
+                        const responseType = responseTypeSelect.value;
+
+                        axios.post(`/hi_sphinx/audio_input?output_type=${responseType}`, base64AudioMessage, {
+                            headers: { 'Content-Type': 'application/octet-stream' }
+                        })
+                            .then(response => {
+                                if (response.data) {
+                                    if (responseType === 'base64') {
+                                        appendMessage(response.data, 'bot-message', true);
+                                    } else {
+                                        appendMessage(response.data, 'bot-message');
+                                    }
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                    };
+                    reader.readAsDataURL(audioBlob);
+                };
+                audioChunks = [];
+                document.getElementById('audio-record').style.display = 'inline';
+            })
+            .catch(error => {
+                console.error('Error accessing microphone:', error);
+            });
+    }
+
+    function stopRecording() {
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+        }
+        document.getElementById('audio-record').style.display = 'none';
+    }
+</script>
+</body>
+</html>

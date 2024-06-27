@@ -1,4 +1,4 @@
-from robyn import Robyn, html
+from robyn import Robyn, html, serve_html
 # from robyn.logger import Logger
 import logging
 from robyn.robyn import Request, Response
@@ -120,6 +120,10 @@ async def hi_sphinx_audio(request):
 async def hi_sphinx_test(request):
     wavbase64 = wav_file_to_base64("source/test.wav")
     return html(wav_base64_to_html(wavbase64))
+
+@app.get("/hi_sphinx")
+async def hi_sphinx_test(request):
+    return serve_html("html/index.html")
         
 def main():
     global model
