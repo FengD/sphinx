@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 ```
 
-* follow the [Ollama](https://github.com/ollama/ollama/blob/main/docs/api.md) to launch the LLM service.
+* follow the [Ollama docker](https://github.com/ollama/ollama/blob/main/docs/docker.md) to launch the LLM service.
 
 ### 3.2. Execute
 
@@ -90,10 +90,10 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6Ik5vZSIsImV4cCI6MTcxOTM5MTY0NX0
 async def auth(request: Request):
 ```
 
-* call service /hi_sphinx/audio `curl -X GET -H "Authorization: Bearer [replace with a valid token]" -H "Content-Type: application/json" http://localhost:8888/hi_sphinx/audio  -F "file=@temp.wav"      -F "metadata={\"filename\": \"temp.wav\", \"description\": \"Sample audio file\"};type=application/json"` get the repley text.
+* call service /hi_sphinx/audio_input `curl -X GET -H "Authorization: Bearer [replace with a valid token]" -H "Content-Type: application/json" http://localhost:8888/hi_sphinx/audio_input?output_type=base64  -F "file=@temp.wav"      -F "metadata={\"filename\": \"temp.wav\", \"description\": \"Sample audio file\"};type=application/json"` get the repley audio in base64.
 
 
-* call service /hi_sphinx/text `curl -X GET -H "Authorization: Bearer [replace with a valid token]" -H "Content-Type: application/json" http://localhost:8888/hi_sphinx/text  -F "file=@temp.wav"      -F "metadata={\"filename\": \"temp.wav\", \"description\": \"Sample audio file\"};type=application/json"` get the replay audio.
+* call service /hi_sphinx/text_input `curl -X GET -H "Authorization: Bearer [replace with a valid token]" -H "Content-Type: application/json" -d '{"prompt": "what's your name?"}' http://localhost:8888/hi_sphinx/text_input?output_type=html ` get the replay audio in html.
 
 ``` shell
 # the audio contents two sentences ["Nice to meet you.", "Welcome to China."]
@@ -107,8 +107,8 @@ Thank you. Its great to be here in China, and Im excited to learn more about thi
 ```
 
 ## 4. Demo
-
-[To Be Done]
+* Try 3.
+[More To Be Done]
 
 ## 5. Test
 
@@ -119,9 +119,10 @@ Thank you. Its great to be here in China, and Im excited to learn more about thi
 
 * [x] create the audio to text service
 * [x] create the audio to audio service
-* [] create image, audio to audio service
-* [] use XIAO ESP32 sence to get the audio
-* [] use XIAO ESP32 sense to connect a headphone to play the voice
-* [] use 3D printer to create a cover
-* [] create an IOS app to display the result
-* [] control some IoT device
+* [x] create the text to audio service
+* [ ] create image, audio to audio service
+* [ ] use XIAO ESP32 sence to get the audio
+* [ ] use XIAO ESP32 sense to connect a headphone to play the voice
+* [ ] use 3D printer to create a cover
+* [ ] create an IOS app to display the result
+* [ ] control some IoT device

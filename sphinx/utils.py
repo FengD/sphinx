@@ -1,5 +1,4 @@
 import whisper
-import numpy as np
 import torch
 torch._dynamo.config.cache_size_limit = 64
 torch._dynamo.config.suppress_errors = True
@@ -9,6 +8,8 @@ import ChatTTS
 import torchaudio
 import requests
 import json
+import base64
+import io
 
 def load_stt_model(
     model_name: str
@@ -96,6 +97,55 @@ def call_ollama_text(
     else:
         print(f"Request failed with status code: {response.status_code}, Response text: {response.text}")
     return None
+
+def wav_file_to_base64(file_path):
+    with open(file_path, 'rb') as wav_file:
+        wav_data = wav_file.read()
+        base64_encoded = base64.b64encode(wav_data).decode('utf-8')
+    return base64_encoded
+
+def wav_tensor_to_base64(wav):
+    buffer = io.BytesIO()
+    torchaudio.save(buffer, wav, 24000, format="wav")
+    buffer.seek(0)
+    return base64.b64encode(buffer.read()).decode('utf-8')
+
+def wav_base64_to_html(base64_string):
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Embedded Base64 WAV Player</title>
+    </head>
+    <body>
+        <audio id="audioPlayer" controls></audio>
+
+        <script>
+            // Base64 encoded WAV string
+            const base64String = "{base64_string}";
+
+            // Create a Blob from the base64 string
+            const binaryString = atob(base64String);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+
+            for (let i = 0; i < len; i++) {{
+                bytes[i] = binaryString.charCodeAt(i);
+            }}
+
+            const blob = new Blob([bytes], {{ type: 'audio/wav' }});
+
+            // Create a URL for the Blob and set it as the source for the audio element
+            const audioUrl = URL.createObjectURL(blob);
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.src = audioUrl;
+        </script>
+    </body>
+    </html>
+    """.format(base64_string=base64_string)
+    return html_content
 
 if __name__ == '__main__':
     model = load_stt_model('large')

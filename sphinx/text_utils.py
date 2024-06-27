@@ -50,5 +50,10 @@ def normalize_text(text):
     text = re.sub(r'。+', '。', text)
     text = re.sub(r'，+', '，', text)
     text = re.sub(r'\.+', '.', text)
+    text = re.sub(r'āáǎà', 'a', text)
+    text = re.sub(r'ēéěèê', 'e', text)
+    text = re.sub(r'ōóǒò', 'o', text)
+    text = re.sub(r'ü', 'u', text)
+    text = re.sub(r'ǐî', 'i', text)
 
     return text
