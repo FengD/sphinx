@@ -6,53 +6,94 @@
     <title>Chat Interface</title>
     <style>
         body {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
             font-family: Arial, sans-serif;
         }
+
         .chat-container {
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            border: 1px solid #ccc;
+            border: none;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
+
         .chat-box {
             height: 400px;
             overflow-y: auto;
-            border: 1px solid #ddd;
+            border: 1px solid #333;
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 10px;
+            background-color: #2E2E2E;
         }
+
         .message {
             margin-bottom: 10px;
             display: flex;
             align-items: center;
         }
+
         .message img {
             border-radius: 50%;
             width: 40px;
             height: 40px;
             margin-right: 10px;
         }
+
         .message.user-message {
             justify-content: flex-end;
         }
+
         .message.user-message img {
             order: 1;
             margin-right: 0;
             margin-left: 10px;
         }
+
         .message.user-message .message-content {
             text-align: right;
+            background-color: #4A4A4A;
+            color: #FFFFFF;
+            padding: 10px;
+            border-radius: 10px;
         }
+
         .message.bot-message {
             justify-content: flex-start;
         }
-        .input-group {
-            display: flex;
-            gap: 10px;
+
+        .message.bot-message .message-content {
+            background-color: #3A3A3A;
+            color: #FFFFFF;
+            padding: 10px;
+            border-radius: 10px;
         }
+
+        .input-group input, .input-group select {
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #2E2E2E;
+            color: #FFFFFF;
+            flex: 1;
+        }
+
+        .input-group button {
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            background-color: #4A90E2;
+            color: #FFFFFF;
+            cursor: pointer;
+        }
+
+        .input-group button:hover {
+            background-color: #357ABD;
+        }
+
     </style>
 </head>
 <body>
