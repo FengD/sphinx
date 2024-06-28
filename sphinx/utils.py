@@ -79,20 +79,31 @@ def call_ollama_text(
         images: list = None,
         model: str = 'llama3',
         is_stream=False,
-        url='http://localhost:11434/api/generate'
+        url='http://localhost:11434/api/chat'
     ) -> str:
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "stream": is_stream
-    }
 
     if images:
-        payload['images'] = images
+        payload = {
+            "model": model,
+            "messages":[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt, "images": images}
+            ],
+            "stream": is_stream
+        }
+    else:
+        payload = {
+            "model": model,
+            "messages":[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            "stream": is_stream
+        }
 
     response = requests.post(url, data=json.dumps(payload), headers={"Content-Type": "application/json"})
     if response.status_code == 200:
-        texts = [response.json()['response']][0]
+        texts = response.json()['message']['content']
         return texts
     else:
         print(f"Request failed with status code: {response.status_code}, Response text: {response.text}")
